@@ -1,5 +1,6 @@
 package client.snake;
 
+import java.awt.Color;
 import java.util.LinkedList;
 
 import client.gui.Grid;
@@ -82,8 +83,28 @@ public class SnakeUtils {
     }
 
     /**
-     * Add a new part to the snake after the tail depending on its current position*/
-    public void addPart() {
-        //TODO
+     * Add a new part to the snake after the tail depending on its current position
+     * (can be enhanced)*/
+    public static void addPart(SnakeLinkedList snake, char direction, Grid screen, Color bodyColor) {
+        Node part = new Node(bodyColor);
+        switch (direction){
+            case 'R':
+                part.setX(snake.getTail().getX() - screen.getUNIT_SIZE());
+                part.setY(snake.getTail().getY());
+                break;
+            case 'L':
+                part.setX(snake.getTail().getX() + screen.getUNIT_SIZE());
+                part.setY(snake.getTail().getY());
+                break;
+            case 'U':
+                part.setX(snake.getTail().getX());
+                part.setY(snake.getTail().getY() + screen.getUNIT_SIZE());
+                break;
+            case 'D':
+                part.setX(snake.getTail().getX());
+                part.setY(snake.getTail().getY() - screen.getUNIT_SIZE());
+                break;
+        }
+        snake.addLast(part); // adding the newly created part to the snake
     }
 }

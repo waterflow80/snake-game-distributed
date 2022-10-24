@@ -25,7 +25,7 @@ public class SnakeLinkedList {
     }
 
     /**
-     * Add the given node a the tail of the list.
+     * Add the given node to the tail of the list.
      * If the list is empty, create a new list and add the node*/
     public void addLast(Node node) {
         if (this.head == null) {

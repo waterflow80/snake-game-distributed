@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import client.snake.SnakeLinkedList;
 import java.util.Random;
 
@@ -24,7 +23,7 @@ public class GamePanel extends JPanel implements ActionListener {
     static final int HEIGHT = 600;
     static final int UNIT_SIZE = 25;
 
-    final Color headColor = Color.green;
+    final Color headColor = new Color(0,240,45);
     final Color appleColor = Color.red;
     final Color bodyColor = new Color(0,180,45);
 
@@ -33,8 +32,8 @@ public class GamePanel extends JPanel implements ActionListener {
     static Grid screen = new Grid(WIDTH, HEIGHT, UNIT_SIZE);
 
 
-    SnakeLinkedList snake1 = new SnakeLinkedList(new Node(0,0,Color.green));
-    int snakeSize = snake1.getSize();
+    SnakeLinkedList mainSnake = new SnakeLinkedList(new Node(0,0,headColor)); // The snake of the current player
+    //int snakeSize = mainSnake.getSize();
     int applesEaten;
     Node apple = new Node();
     char direction = 'R'; // the direction where the snake is heading (R, L, U, D)
@@ -64,33 +63,35 @@ public class GamePanel extends JPanel implements ActionListener {
         draw(g);
     }
 
+
+    /**
+     * Drawing the snake to the screen*/
+    public void drawSnake(SnakeLinkedList snake, Graphics g){
+        // Drawing the head of the snake
+        if (mainSnake.getHead() == null)
+            return; // the snake has no elements to draw
+        g.setColor(mainSnake.getHead().getColor());
+        g.fillRect(mainSnake.getHead().getX(), mainSnake.getHead().getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
+
+        // Drawing the rest of the body parts of the snake
+        g.setColor(bodyColor);
+        Node part = mainSnake.getHead();
+        while (part.getNext() != null) {
+            //System.out.println("Printing the rest of the parts");
+            part = part.getNext();
+            g.fillRect(part.getX(), part.getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
+        }
+    }
+
     public void draw(Graphics g) {
 
         if (running) {
-            /*
-             * // drawing a grid for (int i=0; i<SCREEN_HEIGHT/UNIT_SIZE; i++) {
-             * g.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE, SCREEN_HEIGHT); // On the x axis
-             * g.drawLine(0, i*UNIT_SIZE, SCREEN_WIDTH, i*UNIT_SIZE); // On the y axis }
-             */
-
+            // Drawing the apple
             g.setColor(appleColor); // Setting the standard color to red; From now on everything drew will be in red
             g.fillOval(apple.getX(), apple.getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
 
-
-            // Drawing the head of the snake
-            if (snake1.getHead() == null)
-                return; // the snake has no elements to draw
-            g.setColor(headColor);
-            g.fillRect(snake1.getHead().getX(), snake1.getHead().getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
-
-            // Drawing the body of the snake
-            g.setColor(bodyColor);
-            Node part = snake1.getHead();
-            while (part.getNext() != null) {
-                //System.out.println("Printing the rest of the parts");
-                g.fillRect(part.getX(), part.getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
-                part = part.getNext();
-            }
+            // Drawing the main snake (the current player's snake)
+            drawSnake(mainSnake, g);
 
             // Score text
             g.setColor(Color.red);
@@ -112,18 +113,17 @@ public class GamePanel extends JPanel implements ActionListener {
     /**
      * Perform the move and make the necessary changes*/
     public void move() {
-        SnakeUtils.move(snake1, direction, screen.getUNIT_SIZE());
+        SnakeUtils.move(mainSnake, direction, screen.getUNIT_SIZE());
     }
 
     /**
      * Check whether the apple should be eaten or not*/
     public void checkApple() {
-        if ((snake1.getHead().getX() == apple.getX()) && snake1.getHead().getY() == apple.getY()) {
-            //TODO Move this code and handle it SnakeUtils
-            Node part = new Node(snake1.getTail().getX(), snake1.getTail().getY() + screen.getUNIT_SIZE(), bodyColor);
-            snake1.addLast(part); // adding the newly created part to the snake
+        if ((mainSnake.getHead().getX() == apple.getX()) && mainSnake.getHead().getY() == apple.getY()) {
+            SnakeUtils.addPart(mainSnake,direction, screen, bodyColor);
             applesEaten++;
             newApple();
+            //System.out.println("snake size: " + mainSnake.getSize());
         }
     }
 
@@ -131,7 +131,7 @@ public class GamePanel extends JPanel implements ActionListener {
      * Check whether the snake collides or not.
      * Results in Game Over*/
     public void checkCollision() {
-        if (SnakeUtils.isSnakeCollides(snake1, screen)) {
+        if (SnakeUtils.isSnakeCollides(mainSnake, screen)) {
             running = false; // Stop the game
         }
 

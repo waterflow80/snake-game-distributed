@@ -21,6 +21,11 @@ public class Node {
         this.color = color;
     }
 
+    public Node(Color color) {
+        super();
+        this.color = color;
+    }
+
 
     public int getX() {
         return x;
