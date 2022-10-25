@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener {
     static final int HEIGHT = 600;
     static final int UNIT_SIZE = 25;
 
-    final Color headColor = new Color(0,240,45);
+    final static Color headColor = new Color(0,240,45);
     final Color appleColor = Color.red;
     final Color bodyColor = new Color(0,180,45);
 
@@ -36,7 +36,7 @@ public class GamePanel extends JPanel implements ActionListener {
     // The list of all opponent snakes
     public static List<SnakeLinkedList> opponentSnakes;
 
-    SnakeLinkedList mainSnake = new SnakeLinkedList(new Node(0,0,headColor)); // The snake of the current player
+    public static SnakeLinkedList mainSnake = new SnakeLinkedList(new Node(0,0,headColor)); // The snake of the current player
     //int snakeSize = mainSnake.getSize();
     int applesEaten;
     Node apple = new Node();
@@ -79,14 +79,14 @@ public class GamePanel extends JPanel implements ActionListener {
         System.out.println("Drawing snake: " + snake);
         Thread.sleep(1000);
         // Drawing the head of the snake
-        if (mainSnake.getHead() == null)
+        if (snake.getHead() == null)
             return; // the snake has no elements to draw
-        g.setColor(mainSnake.getHead().getColor());
-        g.fillRect(mainSnake.getHead().getX(), mainSnake.getHead().getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
+        g.setColor(snake.getHead().getColor());
+        g.fillRect(snake.getHead().getX(), snake.getHead().getY(), screen.getUNIT_SIZE(), screen.getUNIT_SIZE());
 
         // Drawing the rest of the body parts of the snake
         g.setColor(bodyColor);
-        Node part = mainSnake.getHead();
+        Node part = snake.getHead();
         while (part.getNext() != null) {
             //System.out.println("Printing the rest of the parts");
             part = part.getNext();
@@ -109,7 +109,6 @@ public class GamePanel extends JPanel implements ActionListener {
                 for (SnakeLinkedList snake: opponentSnakes){
                     drawSnake(snake, g);
                 }
-
             }
 
             // Score text

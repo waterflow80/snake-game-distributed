@@ -32,7 +32,9 @@ public class SnakeServerImpl implements SnakeServer{
     }
 
     @Override
+    /**
+     * Updating the state of the client's snakes*/
     public void updateSnakes(int clientId, SnakeLinkedList snake) throws RemoteException{
-
+        GameSnakes.updateClientSnake(clientId, snake);
     }
 }

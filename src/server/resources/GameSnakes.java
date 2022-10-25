@@ -64,4 +64,10 @@ public class GameSnakes {
         return snakes;
     }
 
+    /**
+     * Update the snake which is mapped with the specified clientId*/
+    public static void updateClientSnake(int clientId, SnakeLinkedList snake){
+        gameSnakes.put(clientId, snake);
+    }
+
 }

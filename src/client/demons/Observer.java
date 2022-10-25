@@ -40,8 +40,8 @@ public class Observer implements Runnable{
                 }
                 //System.out.println("The n° of opponent snakes in the gameOAnel is: " + GamePanel.opponentSnakes.size());
 
-                ////// SENDING DATA //////
-
+                ////// SENDING DATA (SENDING MY SNAKE STATE TO THE SERVER)//////
+                snakeServer.updateSnakes(Id.myId, GamePanel.mainSnake);
 
                 // Waiting for a frame transition time to update
                 Thread.sleep(DELAY);
