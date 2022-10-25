@@ -1,6 +1,8 @@
 package client.snake;
 
-public class SnakeLinkedList {
+import java.io.Serializable;
+
+public class SnakeLinkedList implements Serializable {
     private Node head;
 
     public SnakeLinkedList() {

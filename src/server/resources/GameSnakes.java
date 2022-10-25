@@ -54,12 +54,13 @@ public class GameSnakes {
         if (gameSnakes.isEmpty())
             return null;
 
-        List<SnakeLinkedList> snakes = gameSnakes.entrySet()
-                .stream()
-                .filter(set -> !set.getKey().equals(clientId))
-                .map(set -> set.getValue())
-                .collect(Collectors.toList());
-
+        List<SnakeLinkedList> snakes = new ArrayList<>();
+        for (Map.Entry<Integer, SnakeLinkedList> entry: gameSnakes.entrySet()){
+            if(entry.getKey() != clientId)
+                snakes.add(entry.getValue());
+        }
+       // System.out.println("GamesSnakes: Snakes are: ");
+       // snakes.forEach(System.out::println);
         return snakes;
     }
 

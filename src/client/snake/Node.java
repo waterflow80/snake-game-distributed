@@ -1,8 +1,9 @@
 package client.snake;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Node {
+public class Node implements Serializable {
     private int x;
     private int y;
     private Color color;

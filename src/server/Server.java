@@ -1,5 +1,8 @@
 package server;
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,25 +10,27 @@ import java.util.stream.Collectors;
 
 public class Server {
     public static void main(String[] args){
-        Map<Integer, String> map = new HashMap<>();
-        map.put(10, "apple");
-        map.put(20, "orange");
-        map.put(30, "banana");
-        map.put(40, "watermelon");
-        map.put(50, "dragonfruit");
 
-        System.out.println("\n1. Export Map Key to List...");
+        try {
+            // Set hostname for the server using JavaProperty
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+            System.out.println("Server has been started..");
 
-        List<Integer> result = map.keySet().stream()
-                                  .collect(Collectors.toList());
+            // Create an instance of the SnakeServer
+            SnakeServer snakeServer = new SnakeServerImpl();
 
-        result.forEach(System.out::println);
+            // Export the SnakeServer
+            SnakeServer stub = (SnakeServer) UnicastRemoteObject.exportObject(snakeServer, 0);
 
-        System.out.println("\n2. Export Map Value to List...");
+            // Get the registry to register the object
+            Registry registry = LocateRegistry.getRegistry("127.0.0.1", 9100);
 
-        List<String> result2 = map.values().stream()
-                                  .collect(Collectors.toList());
+            // Register the exported class in RMI registry with some name
+            registry.bind("snakeServer", stub);
 
-        result2.forEach(System.out::println);
+            System.out.println("Exporting and binding of objects has completed");
+        }catch (Exception e){
+            System.out.println("Server: Some server problem: " + e);
+        }
     }
 }

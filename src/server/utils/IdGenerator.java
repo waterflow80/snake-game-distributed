@@ -1,4 +1,4 @@
-package client.utils;
+package server.utils;
 
 public class IdGenerator {
     public static Integer id = -1;

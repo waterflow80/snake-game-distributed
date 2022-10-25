@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import client.snake.SnakeLinkedList;
-import client.utils.IdGenerator;
+import server.utils.IdGenerator;
 import server.resources.Client;
 import server.resources.Clients;
 import server.resources.GameSnakes;
@@ -20,11 +20,19 @@ public class SnakeServerImpl implements SnakeServer{
         Client client = new Client(id, snake);
         Clients.addClient(client); // Adding a client to the list of the clients
         GameSnakes.addGameSnake(id, snake); // Adding the tuple (id, snake) to the GameSnake Map
+        //System.out.println("The received snake is : " + snake);
         return id;
     }
 
     @Override
-    public List<SnakeLinkedList> getOpponentSnakes() throws RemoteException {
-        return null;
+    /**
+     * Return all the opponent Snakes*/
+    public List<SnakeLinkedList> getOpponentSnakes(int exceptId) throws RemoteException {
+        return GameSnakes.getAllSnakesExcept(exceptId);
+    }
+
+    @Override
+    public void updateSnakes(int clientId, SnakeLinkedList snake) throws RemoteException{
+
     }
 }

@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import client.snake.SnakeLinkedList;
+
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.JPanel;
@@ -31,6 +33,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     static Grid screen = new Grid(WIDTH, HEIGHT, UNIT_SIZE);
 
+    // The list of all opponent snakes
+    public static List<SnakeLinkedList> opponentSnakes;
 
     SnakeLinkedList mainSnake = new SnakeLinkedList(new Node(0,0,headColor)); // The snake of the current player
     //int snakeSize = mainSnake.getSize();
@@ -60,13 +64,20 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        draw(g);
+        try {
+            draw(g);
+        } catch (
+                InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     /**
      * Drawing the snake to the screen*/
-    public void drawSnake(SnakeLinkedList snake, Graphics g){
+    public void drawSnake(SnakeLinkedList snake, Graphics g) throws InterruptedException {
+        System.out.println("Drawing snake: " + snake);
+        Thread.sleep(1000);
         // Drawing the head of the snake
         if (mainSnake.getHead() == null)
             return; // the snake has no elements to draw
@@ -83,7 +94,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g) throws InterruptedException {
 
         if (running) {
             // Drawing the apple
@@ -92,6 +103,14 @@ public class GamePanel extends JPanel implements ActionListener {
 
             // Drawing the main snake (the current player's snake)
             drawSnake(mainSnake, g);
+
+            // Drawing the opponent snakes if existed
+            if (opponentSnakes != null){
+                for (SnakeLinkedList snake: opponentSnakes){
+                    drawSnake(snake, g);
+                }
+
+            }
 
             // Score text
             g.setColor(Color.red);
