@@ -11,6 +11,7 @@ import client.opponent.OpponentSnakes;
 import client.resources.Id;
 import client.snake.SnakeLinkedList;
 import server.SnakeServer;
+import server.resources.Coordinates;
 
 /**
  * This class will be working continuously to check possible changes from
@@ -32,7 +33,12 @@ public class Observer implements Runnable{
     public void run() {
         while (true){
             try {
-                ////// FETCHING DATA //////
+                ////// FETCHING APPLE COORDINATES /////
+                Coordinates cord = snakeServer.getApplePosition();
+                GamePanel.apple.setX(cord.getX());
+                GamePanel.apple.setY(cord.getY());
+
+                ////// FETCHING OPPONENT SNAKES //////
                 List<SnakeLinkedList> opponentSnakes = snakeServer.getOpponentSnakes(Id.myId);
                 if (!opponentSnakes.isEmpty()) {
                     // Updating the list of opponent snakes

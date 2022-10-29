@@ -9,8 +9,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import client.resources.GameUpdater;
+import client.resources.Id;
+import client.snake.Colors;
+import client.snake.MainSnake;
 import client.snake.SnakeLinkedList;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Random;
 
@@ -25,9 +32,8 @@ public class GamePanel extends JPanel implements ActionListener {
     static final int HEIGHT = 600;
     static final int UNIT_SIZE = 25;
 
-    final static Color headColor = new Color(0,240,45);
     final Color appleColor = Color.red;
-    final Color bodyColor = new Color(0,180,45);
+    public static Color bodyColor = null;
 
     static final int DELAY = 100; // The interval between one frame and the other
 
@@ -36,17 +42,20 @@ public class GamePanel extends JPanel implements ActionListener {
     // The list of all opponent snakes
     public static List<SnakeLinkedList> opponentSnakes;
 
-    public static SnakeLinkedList mainSnake = new SnakeLinkedList(new Node(0,0,headColor)); // The snake of the current player
+    public static SnakeLinkedList mainSnake = MainSnake.mainSnake;
     //int snakeSize = mainSnake.getSize();
     int applesEaten;
-    Node apple = new Node();
+    public static Node apple = new Node();
     char direction = 'R'; // the direction where the snake is heading (R, L, U, D)
     boolean running = true;
     Timer timer;
     Random random;
 
+    GameUpdater gameUpdater = new GameUpdater(); // The object that will be charged to update the apple position in
+    // the server
 
-    public GamePanel(){
+
+    public GamePanel() throws NotBoundException, RemoteException {
         random = new Random();
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         this.setBackground(Color.black);
@@ -55,7 +64,7 @@ public class GamePanel extends JPanel implements ActionListener {
         startGame();
     }
 
-    public void startGame() {
+    public void startGame() throws RemoteException {
         newApple();
         running = true;
         timer = new Timer(DELAY, this);
@@ -67,7 +76,8 @@ public class GamePanel extends JPanel implements ActionListener {
         try {
             draw(g);
         } catch (
-                InterruptedException e) {
+                InterruptedException |
+                RemoteException e) {
             throw new RuntimeException(e);
         }
     }
@@ -76,8 +86,8 @@ public class GamePanel extends JPanel implements ActionListener {
     /**
      * Drawing the snake to the screen*/
     public void drawSnake(SnakeLinkedList snake, Graphics g) throws InterruptedException {
-        System.out.println("Drawing snake: " + snake);
-        Thread.sleep(1000);
+        //System.out.println("Drawing snake: " + snake);
+        Thread.sleep(600); //Used for testing purposes
         // Drawing the head of the snake
         if (snake.getHead() == null)
             return; // the snake has no elements to draw
@@ -94,7 +104,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    public void draw(Graphics g) throws InterruptedException {
+    public void draw(Graphics g) throws InterruptedException, RemoteException {
 
         if (running) {
             // Drawing the apple
@@ -123,9 +133,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     /**
      * Create a new apple in a random position*/
-    public void newApple() {
-        apple.setX(random.nextInt((int) screen.getWIDTH()/UNIT_SIZE) * UNIT_SIZE);
-        apple.setY(random.nextInt((int) screen.getHEIGHT()/UNIT_SIZE) * UNIT_SIZE);
+    public void newApple() throws RemoteException {
+        gameUpdater.updateApple();
     }
 
     /**
@@ -136,9 +145,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     /**
      * Check whether the apple should be eaten or not*/
-    public void checkApple() {
+    public void checkApple() throws RemoteException {
         if ((mainSnake.getHead().getX() == apple.getX()) && mainSnake.getHead().getY() == apple.getY()) {
-            SnakeUtils.addPart(mainSnake,direction, screen, bodyColor);
+            SnakeUtils.addPart(mainSnake,direction, screen);
             applesEaten++;
             newApple();
             //System.out.println("snake size: " + mainSnake.getSize());
@@ -149,7 +158,13 @@ public class GamePanel extends JPanel implements ActionListener {
      * Check whether the snake collides or not.
      * Results in Game Over*/
     public void checkCollision() {
+        // Check collision with the screen border or with the snake itself
         if (SnakeUtils.isSnakeCollides(mainSnake, screen)) {
+            running = false; // Stop the game
+        }
+
+        // Check if the snake collides with opponent snakes
+        if(SnakeUtils.isSnakeCollidesWithOtherSnakes(mainSnake, opponentSnakes)){
             running = false; // Stop the game
         }
 
@@ -161,7 +176,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
     /**
      * Stop the game and display the Game Over Screen*/
-    public void gameOver(Graphics g) {
+    public void gameOver(Graphics g) throws RemoteException {
+        // Telling the server to remove me from the game
+        gameUpdater.leaveGame(Id.myId);
+
         // Score text
         g.setColor(Color.red);
         g.setFont(new Font("Ink Free", Font.BOLD, 40));
@@ -175,15 +193,19 @@ public class GamePanel extends JPanel implements ActionListener {
         g.drawString("Game Over", (screen.getWIDTH() -metrics2.stringWidth("Game Over"))/2, screen.getHEIGHT()/2);
     }
     @Override
-    public void actionPerformed(ActionEvent e ) {
+    public void actionPerformed(ActionEvent e) {
         // The game process
         if(running) {
             move();
-            checkApple();
+            try {
+                checkApple();
+            } catch (
+                    RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
             checkCollision();
         }
         repaint();
-
     }
 
     public class MyKeyAdapter extends KeyAdapter{

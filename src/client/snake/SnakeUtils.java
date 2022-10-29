@@ -2,6 +2,7 @@ package client.snake;
 
 import java.awt.Color;
 import java.util.LinkedList;
+import java.util.List;
 
 import client.gui.Grid;
 
@@ -83,10 +84,34 @@ public class SnakeUtils {
     }
 
     /**
+     * Check whether the snake collides with enemy snakes*/
+    public static boolean isSnakeCollidesWithOtherSnakes(SnakeLinkedList snake, List<SnakeLinkedList> otherSnakes){
+        // checks if head collides with body
+        Node head = snake.getHead();
+        if(head == null)
+            return false;
+        if (otherSnakes != null){
+            for (SnakeLinkedList s: otherSnakes){
+                Node temp = s.getHead();
+                while (temp != null){
+                    if (temp.getX() == head.getX() && temp.getY() == head.getY()){
+                        System.out.println("SnakeUtils: Snake collides with other snake");
+                        return true;
+                    }
+                    temp = temp.getNext();
+
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Add a new part to the snake after the tail depending on its current position
      * (can be enhanced)*/
-    public static void addPart(SnakeLinkedList snake, char direction, Grid screen, Color bodyColor) {
-        Node part = new Node(bodyColor);
+    public static void addPart(SnakeLinkedList snake, char direction, Grid screen) {
+        Node part = new Node(Colors.snakeBodyColor);
         switch (direction){
             case 'R':
                 part.setX(snake.getTail().getX() - screen.getUNIT_SIZE());

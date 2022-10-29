@@ -1,9 +1,11 @@
 package server.resources;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import client.snake.SnakeLinkedList;
@@ -11,6 +13,10 @@ import client.snake.SnakeLinkedList;
 public class GameSnakes {
     // The gameSnakes contains all client's snakes for each client id
     private static Map<Integer, SnakeLinkedList> gameSnakes = new HashMap<>();
+    private static List<Coordinates> initialSnakeHeadCoordinates = new ArrayList<>(); // ( coordinates)
+    private static Random random = new Random();
+
+    private static List<Color> snakeColors = new ArrayList<>(); // snake colors
 
     /**
      * Add a new game snake to the gameSnakes*/
@@ -68,6 +74,71 @@ public class GameSnakes {
      * Update the snake which is mapped with the specified clientId*/
     public static void updateClientSnake(int clientId, SnakeLinkedList snake){
         gameSnakes.put(clientId, snake);
+        //System.out.println("Snake N°: (Y=" + snake.getHead().getY() + ",X=" + snake.getHead().getX() + ")"); // Testing purposes
+    }
+
+    /**Generating a new coordinates, different from those in the initialSnakeHeadCoordinates and saving them
+     * */
+    public static Coordinates generateNewCoordinates(){
+        // Random coordinates that does not exist in the Map
+        boolean exist = true;
+        int x;
+        int y;
+        x = random.nextInt((int) GuiInfo.WIDTH / GuiInfo.UNIT_SIZE) * GuiInfo.UNIT_SIZE;
+        y = random.nextInt((int) GuiInfo.WIDTH / GuiInfo.UNIT_SIZE) * GuiInfo.UNIT_SIZE;
+        while (exist){
+            exist = false;
+            for (Coordinates c : initialSnakeHeadCoordinates){
+                if (c.getX() == x && c.getY() == y){
+                    exist = true;
+                    x = random.nextInt((int) GuiInfo.WIDTH / GuiInfo.UNIT_SIZE) * GuiInfo.UNIT_SIZE;
+                    y = random.nextInt((int) GuiInfo.WIDTH / GuiInfo.UNIT_SIZE) * GuiInfo.UNIT_SIZE;
+                }
+
+            }
+        }
+        Coordinates cord = new Coordinates(x,y);
+        // saving new coordinates to the map
+        initialSnakeHeadCoordinates.add(cord);
+
+        // return the new coordinates
+        return cord;
+    }
+
+    private static int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
+    /**
+     * Check weather the color exists or not*/
+    private static boolean isColorExist(int r, int g, int b){
+        for (Color c: snakeColors){
+            if (c.getBlue() == b || c.getGreen() == g || c.getRed() == r){
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    /**
+     * Generating a new color that hasn't been used before*/
+    public static Color generateColor(){
+        int r = getRandomNumber(0, 255);
+        int g = getRandomNumber(0, 255);
+        int b = getRandomNumber(0, 255);
+
+        while (isColorExist(r,g,b)){
+            r = getRandomNumber(0, 255);
+            g = getRandomNumber(0, 255);
+            b = getRandomNumber(0, 255);
+        }
+
+        Color color = new Color(r,g,b);
+        snakeColors.add(color); // adding the new color to the list
+        return color;
+
+
     }
 
 }
