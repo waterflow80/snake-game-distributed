@@ -45,7 +45,9 @@ public class GameSnakes {
      * Remove the tuple (clientId, Snake) from the gamesSnakes
      */
     public static void removeGameSnakeByClientId(Integer id){
+        System.out.println("Snakes before: " + gameSnakes.size());
         gameSnakes.remove(id);
+        System.out.println("Snakes after: " + gameSnakes.size());
     }
 
     /**
@@ -57,6 +59,7 @@ public class GameSnakes {
     /**
      * Return all snakes except the one that is mapped by the specified id*/
     public static List<SnakeLinkedList> getAllSnakesExcept(Integer clientId){
+
         if (gameSnakes.isEmpty())
             return null;
 
@@ -67,13 +70,15 @@ public class GameSnakes {
         }
        // System.out.println("GamesSnakes: Snakes are: ");
        // snakes.forEach(System.out::println);
+       // System.out.println("All Snakes Except are : " + snakes.size());
         return snakes;
     }
 
     /**
      * Update the snake which is mapped with the specified clientId*/
     public static void updateClientSnake(int clientId, SnakeLinkedList snake){
-        gameSnakes.put(clientId, snake);
+        if (snake != null)
+            gameSnakes.put(clientId, snake);
         //System.out.println("Snake N°: (Y=" + snake.getHead().getY() + ",X=" + snake.getHead().getX() + ")"); // Testing purposes
     }
 

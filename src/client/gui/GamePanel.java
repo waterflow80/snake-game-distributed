@@ -18,6 +18,7 @@ import client.snake.SnakeLinkedList;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -35,12 +36,12 @@ public class GamePanel extends JPanel implements ActionListener {
     final Color appleColor = Color.red;
     public static Color bodyColor = null;
 
-    static final int DELAY = 100; // The interval between one frame and the other
+    static final int DELAY = 150; // The interval between one frame and the other
 
     static Grid screen = new Grid(WIDTH, HEIGHT, UNIT_SIZE);
 
     // The list of all opponent snakes
-    public static List<SnakeLinkedList> opponentSnakes;
+    public static List<SnakeLinkedList> opponentSnakes = new ArrayList<>();
 
     public static SnakeLinkedList mainSnake = MainSnake.mainSnake;
     //int snakeSize = mainSnake.getSize();
@@ -87,7 +88,8 @@ public class GamePanel extends JPanel implements ActionListener {
      * Drawing the snake to the screen*/
     public void drawSnake(SnakeLinkedList snake, Graphics g) throws InterruptedException {
         //System.out.println("Drawing snake: " + snake);
-        Thread.sleep(600); //Used for testing purposes
+        //Thread.sleep(500); //Used for testing purposes
+
         // Drawing the head of the snake
         if (snake.getHead() == null)
             return; // the snake has no elements to draw
@@ -116,6 +118,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
             // Drawing the opponent snakes if existed
             if (opponentSnakes != null){
+                //System.out.println("Opponent Snakes: " + opponentSnakes.size());
                 for (SnakeLinkedList snake: opponentSnakes){
                     drawSnake(snake, g);
                 }
@@ -157,7 +160,7 @@ public class GamePanel extends JPanel implements ActionListener {
     /**
      * Check whether the snake collides or not.
      * Results in Game Over*/
-    public void checkCollision() {
+    public void checkCollision() throws RemoteException {
         // Check collision with the screen border or with the snake itself
         if (SnakeUtils.isSnakeCollides(mainSnake, screen)) {
             running = false; // Stop the game
@@ -165,20 +168,21 @@ public class GamePanel extends JPanel implements ActionListener {
 
         // Check if the snake collides with opponent snakes
         if(SnakeUtils.isSnakeCollidesWithOtherSnakes(mainSnake, opponentSnakes)){
+
             running = false; // Stop the game
         }
 
 
         if (!running) {
+            // Telling the server to remove me from the game
+            gameUpdater.leaveGame(Id.myId);
             timer.stop();
         }
     }
 
     /**
      * Stop the game and display the Game Over Screen*/
-    public void gameOver(Graphics g) throws RemoteException {
-        // Telling the server to remove me from the game
-        gameUpdater.leaveGame(Id.myId);
+    public void gameOver(Graphics g){
 
         // Score text
         g.setColor(Color.red);
@@ -203,7 +207,12 @@ public class GamePanel extends JPanel implements ActionListener {
                     RemoteException ex) {
                 throw new RuntimeException(ex);
             }
-            checkCollision();
+            try {
+                checkCollision();
+            } catch (
+                    RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         repaint();
     }

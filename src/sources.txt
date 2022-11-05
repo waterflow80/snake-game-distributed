@@ -1,4 +1,5 @@
 ./client/Client.java
+./client/demons/Demon.java
 ./client/demons/Observer.java
 ./client/gui/GameFrame.java
 ./client/gui/GamePanel.java

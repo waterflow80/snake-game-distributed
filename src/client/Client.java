@@ -6,9 +6,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import client.demons.Demon;
 import client.demons.Observer;
 import client.gui.GameFrame;
 import client.gui.GamePanel;
+import client.resources.GameUpdater;
 import client.resources.Id;
 import client.snake.Colors;
 import client.snake.MainSnake;
@@ -47,9 +49,12 @@ public class Client {
         // Saving the id that I got from the server
         Id.myId = id;
 
+
         // Starting the observer thread object
         Thread observer = new Thread(new Observer());
-        observer.start();
+        Demon.observer = observer;
+        Demon.observer.start();
+
 
         Thread.sleep(10); // Waiting few moments until the observer has completed downloading all components from the server
 
@@ -57,8 +62,11 @@ public class Client {
         new GameFrame();
         Thread.sleep(1000); // To be removed (for testing purposes only)
 
+        System.out.println("Waiting for observer");
 
         // waiting for the observer to complete the job
-        observer.join();
+        Demon.observer.join();
+
+        System.out.println("---- Thread joined ----");
     }
 }

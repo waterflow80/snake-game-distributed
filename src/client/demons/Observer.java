@@ -42,12 +42,18 @@ public class Observer implements Runnable{
                 List<SnakeLinkedList> opponentSnakes = snakeServer.getOpponentSnakes(Id.myId);
                 if (!opponentSnakes.isEmpty()) {
                     // Updating the list of opponent snakes
-                    GamePanel.opponentSnakes = opponentSnakes;
+                    //GamePanel.opponentSnakes = opponentSnakes;
+                    System.out.println("Fetched opponent snakes: " + opponentSnakes.size());
+                    GamePanel.opponentSnakes.clear(); // deleting the old list of snakes
+                    GamePanel.opponentSnakes.addAll(opponentSnakes); // updating the list of opponents
                 }
                 //System.out.println("The n° of opponent snakes in the gameOAnel is: " + GamePanel.opponentSnakes.size());
 
                 ////// SENDING DATA (SENDING MY SNAKE STATE TO THE SERVER)//////
-                snakeServer.updateSnakes(Id.myId, GamePanel.mainSnake);
+                if (GamePanel.mainSnake != null){
+                    snakeServer.updateSnakes(Id.myId, GamePanel.mainSnake);
+                }
+
 
                 // Waiting for a frame transition time to update
                 Thread.sleep(DELAY);

@@ -5,6 +5,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import client.demons.Demon;
+import client.demons.Observer;
 import server.SnakeServer;
 
 /**
@@ -30,6 +32,10 @@ public class GameUpdater {
     /**
      * Send a request to the server to leave the game (Game over)*/
     public void leaveGame(int myId) throws RemoteException {
+        // killing the observer thread, so he won't send extra information to the server
+        Demon.observer.interrupt();
+
+        // Request the server to remove myself from the server
         snakeServer.removePlayer(myId);
     }
 
