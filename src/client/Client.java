@@ -20,10 +20,18 @@ import server.resources.Coordinates;
 public class Client {
     public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException {
 
+        // Check how many arguments were passed in
+        if (args.length < 2) {
+            System.out.println("Destination IP Address, and Port Required ! For RMI Registry");
+            System.exit(0);
+        }
+
+        final String ipAddressServer = args[0];
+        final int port = Integer.parseInt(args[1]);
 
 
         // Locate the registry
-        Registry registry = LocateRegistry.getRegistry("127.0.0.1", 9100);
+        Registry registry = LocateRegistry.getRegistry(ipAddressServer, port);
 
         // Get the reference of the exported object from RMI Registry
         SnakeServer snakeServer = (SnakeServer) registry.lookup("snakeServer");

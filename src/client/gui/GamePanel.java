@@ -29,8 +29,8 @@ import client.snake.Node;
 import client.snake.SnakeUtils;
 
 public class GamePanel extends JPanel implements ActionListener {
-    static final int WIDTH = 600;
-    static final int HEIGHT = 600;
+    static final int WIDTH = 1200;
+    static final int HEIGHT = 800;
     static final int UNIT_SIZE = 25;
 
     final Color appleColor = Color.red;
