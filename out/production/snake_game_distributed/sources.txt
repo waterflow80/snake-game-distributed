@@ -19,6 +19,7 @@
 ./server/resources/Coordinates.java
 ./server/resources/GameSnakes.java
 ./server/resources/GuiInfo.java
+./server/rmi/RmiLauncher.java
 ./server/Server.java
 ./server/SnakeServer.java
 ./server/SnakeServerImpl.java

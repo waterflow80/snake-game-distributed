@@ -18,6 +18,8 @@ import server.SnakeServer;
 import server.resources.Coordinates;
 
 public class Client {
+    public static String ipAddressServer;
+    public static int port;
     public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException {
 
         // Check how many arguments were passed in
@@ -26,8 +28,8 @@ public class Client {
             System.exit(0);
         }
 
-        final String ipAddressServer = args[0];
-        final int port = Integer.parseInt(args[1]);
+        ipAddressServer = args[0];
+        port = Integer.parseInt(args[1]);
 
 
         // Locate the registry
@@ -59,7 +61,9 @@ public class Client {
 
 
         // Starting the observer thread object
-        Thread observer = new Thread(new Observer());
+        Thread observer = new Thread(new Observer(ipAddressServer, port));
+
+
         Demon.observer = observer;
         Demon.observer.start();
 

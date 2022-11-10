@@ -20,14 +20,24 @@ public class Observer implements Runnable{
 
     static final int DELAY = 100; // The interval between one frame and the other
 
+    public String ipAddressRmi;
+    public Integer port;
+
+    private Registry registry;
+    private SnakeServer snakeServer;
+
+    public Observer(String ip, Integer port) throws RemoteException, NotBoundException {
+        this.ipAddressRmi = ip;
+        this.port = port;
+        registry = LocateRegistry.getRegistry(ipAddressRmi, port);
+        snakeServer = (SnakeServer) registry.lookup("snakeServer");
+    }
+
     // Locate the registry
-    private Registry registry = LocateRegistry.getRegistry("127.0.0.1", 9100);
+
 
     // Get the server object
-    private SnakeServer snakeServer = (SnakeServer) registry.lookup("snakeServer");
 
-    public Observer() throws RemoteException, NotBoundException {
-    }
 
     @Override
     public void run() {
@@ -56,11 +66,8 @@ public class Observer implements Runnable{
 
 
                 // Waiting for a frame transition time to update
-                Thread.sleep(DELAY);
-            } catch (
-                    InterruptedException e) {
-                throw new RuntimeException(e);
-            }catch (RemoteException re){
+                //Thread.sleep(DELAY);
+            } catch (RemoteException re){
                 System.out.println("Observer: Remote exception thrown !!");
             }
         }

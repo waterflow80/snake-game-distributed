@@ -13,20 +13,28 @@ import server.SnakeServer;
  * Will be charged of sending game updates to the server*/
 public class GameUpdater {
 
+
+    private String ipAddressRmi;
+    private int port;
+
     // Locate the registry
-    private Registry registry = LocateRegistry.getRegistry("127.0.0.1", 9100);
+    private Registry registry;
 
     // Get the server object
-    private SnakeServer snakeServer = (SnakeServer) registry.lookup("snakeServer");
+    private SnakeServer snakeServer;
 
-    public GameUpdater() throws RemoteException, NotBoundException {
-
+    public GameUpdater(String ip, int port) throws RemoteException, NotBoundException {
+        this.ipAddressRmi = ip;
+        this.port = port;
+        registry = LocateRegistry.getRegistry(ipAddressRmi, port);
+        snakeServer = (SnakeServer) registry.lookup("snakeServer");
     }
 
     /**
      * Sending a request to the server to ask him to update (change) the apple position*/
     public void updateApple() throws RemoteException {
         snakeServer.updateApple();
+
     }
 
     /**

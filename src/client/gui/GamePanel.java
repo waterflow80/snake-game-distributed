@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import client.Client;
 import client.resources.GameUpdater;
 import client.resources.Id;
 import client.snake.Colors;
@@ -52,7 +53,8 @@ public class GamePanel extends JPanel implements ActionListener {
     Timer timer;
     Random random;
 
-    GameUpdater gameUpdater = new GameUpdater(); // The object that will be charged to update the apple position in
+
+    GameUpdater gameUpdater = new GameUpdater(Client.ipAddressServer, Client.port); // The object that will be charged to update the apple position in
     // the server
 
 
